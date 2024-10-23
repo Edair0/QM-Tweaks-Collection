@@ -17,7 +17,7 @@ The configuration file will be created on the first game run and can be found at
 |satiety_kg|Set how many KG of weight are needed for 1 satiety drain|50|10|
 
 Everything can be also configured while in-game without the need to restart it.
-Use console command 'help mod_inventory' or just 'mod_inventory' to display all available commands.
+Use console command `help mod_inventory` or `mod_inventory` to display all available commands.
 
 # Source Code
 Source code is available on GitHub at https://github.com/Edair0/edair_mod_inventory
