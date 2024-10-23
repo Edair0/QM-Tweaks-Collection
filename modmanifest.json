@@ -1,0 +1,7 @@
+{
+  "UniqueModName": "Edair0_edair_mod_inventory",
+  "Assemblies": [
+    "edair_mod_inventory.dll"
+  ],
+  "Dependencies": []
+}
