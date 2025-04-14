@@ -1,15 +1,17 @@
 ﻿using MGSC;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Resources;
+using System.Threading;
+using UnityEngine;
 
 namespace edair_mod_inventory
 {
+
+    [ConsoleCommand(new string[] { CommandName })]
     public class ModCommand
     {
-        public static string CommandName { get; set; } = "mod_inventory";
+        public const string CommandName = "mod_inventory";
         public static List<string> SettingsList { get; set; } = new List<string>() { "show", "reload", "default", "vanilla", "bp_slots_flat", "bp_slots_mult", "bp_weight_flat", "vest_slots_flat", "vest_slots_mult", "satiety_kg" };
 
         public static string Help(string command, bool verbose)
