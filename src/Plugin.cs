@@ -11,7 +11,7 @@ namespace edair_mod_inventory
     public static class Plugin
     {
         public static string ModAssemblyName => Assembly.GetExecutingAssembly().GetName().Name;
-        public static string ConfigPath => Path.Combine(Application.persistentDataPath, Assembly.GetExecutingAssembly().GetName().Name) + ".json";
+        public static string ConfigPath => Path.Combine(Application.persistentDataPath + "\\edair_mod", Assembly.GetExecutingAssembly().GetName().Name) + ".json";
         public static string ModPersistenceFolder => Path.Combine(Application.persistentDataPath, Assembly.GetExecutingAssembly().GetName().Name);
 
         public static ModConfig Config { get; set; }
@@ -22,10 +22,13 @@ namespace edair_mod_inventory
             Config = ModConfigSerializer.LoadConfig(ConfigPath);
             new Harmony("Edair0_" + ModAssemblyName).PatchAll();
 
+            AddCommand(typeof(ModCommand), ModCommand.CommandName);
+        }
+
+        public static void AddCommand(Type commandType, string name)
+        {
             ConsoleDaemon consoleDaemon = ConsoleDaemon.Instance;
             if (ConsoleDaemon.Instance == null) return;
-            Type commandType = typeof(BackpackModSettingCommand);
-            string name = BackpackModSettingCommand.CommandName;
 
             MethodInfo helpMethod = commandType.GetMethod("Help", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Standard, new Type[2] { typeof(string), typeof(bool) }, null);
             MethodInfo fetchAutocompleteMethod = commandType.GetMethod("FetchAutocompleteOptions", BindingFlags.Static | BindingFlags.Public, null, CallingConventions.Standard, new Type[2] { typeof(string), typeof(string[]) }, null);

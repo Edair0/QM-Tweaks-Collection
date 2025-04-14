@@ -96,6 +96,9 @@ namespace edair_mod_inventory
             ModConfig config;
             JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { Formatting = Formatting.Indented, };
 
+            string configDirectory = Path.GetDirectoryName(configPath);
+            Directory.CreateDirectory(configDirectory);
+
             if (File.Exists(configPath))
             {
                 try

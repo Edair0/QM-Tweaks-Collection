@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace edair_mod_inventory
 {
-    public class BackpackModSettingCommand
+    public class ModCommand
     {
         public static string CommandName { get; set; } = "mod_inventory";
         public static List<string> SettingsList { get; set; } = new List<string>() { "show", "reload", "default", "vanilla", "bp_slots_flat", "bp_slots_mult", "bp_weight_flat", "vest_slots_flat", "vest_slots_mult", "satiety_kg" };

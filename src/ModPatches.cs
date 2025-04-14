@@ -51,10 +51,10 @@ namespace edair_mod_inventory
         }
     }
 
-    [HarmonyPatch(typeof(Mercenary), "GetItemsWeightSatietyDrain")]
+    [HarmonyPatch(typeof(CreatureData), "GetItemsWeightSatietyDrain")]
     public static class PatchSatietyDrain
     {
-        private static void Postfix(ref float __result, Mercenary __instance)
+        private static void Postfix(ref float __result, CreatureData __instance)
         {
             __result = -Mathf.RoundToInt(__instance.GetItemsWeight() / Plugin.Config.satiety_kg);
         }
