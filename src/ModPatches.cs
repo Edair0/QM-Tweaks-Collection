@@ -28,15 +28,14 @@ namespace edair_mod_inventory
         }
     }
 
-    [HarmonyPatch(typeof(BackpackRecord), "get_TotalItemsWeightMult")]
+    [HarmonyPatch(typeof(BackpackRecord), "get_BackpackWeightMult")]
     public static class PatchBackpackMult
     {
         private static void Postfix(ref float __result)
         {
-
-            __result = Mathf.Max(__result - Plugin.Config.bp_weight_flat * 0.01f, 0.1f);
-            __result = Mathf.Min(__result, 1.0f);
-            //DevConsoleUI.Instance.PrintText("Value:" + __result.ToString());
+            __result = Mathf.Max(__result - Plugin.Config.bp_weight_flat * 0.01f, 0f);
+            __result = Mathf.Min(__result, 1f);
+            DevConsole.print("Value:" + __result.ToString());
         }
     }
 
@@ -46,7 +45,7 @@ namespace edair_mod_inventory
         private static void Postfix(ref int __result)
         {
             __result = Mathf.RoundToInt(__result * Plugin.Config.vest_slots_mult);
-            __result = Math.Min(__result + Plugin.Config.vest_slots_flat, 6);
+            __result = Math.Min(__result + Plugin.Config.vest_slots_flat, 8);
             __result = Math.Max(__result, 1);
         }
     }
