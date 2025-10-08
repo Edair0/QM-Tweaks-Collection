@@ -10,6 +10,13 @@ Some changes can affect balance, so enable selectively to preserve your preferre
 
 The collection may expand over time with new tweaks or adjustments. If you want a feature added, feel free to use GitHub Issues for suggestions.
 
+# Current Features:
+- Global weight modifier for equipment and backpacks
+- Satiety drain rate adjustment
+- Vest slot count modifier
+- Hearing toggle with adjustable range
+- Custom difficulty preset
+
 # Configuration
 The configuration file will be created on the first game run and can be found at
 
