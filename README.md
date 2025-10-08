@@ -1,4 +1,5 @@
-# QM Tweaks Collection (Formely Quasimorph Double Backpack Size)
+# QM Tweaks Collection 
+(Formerly Quasimorph Double Backpack Size)
 
 ![thumbnail icon](media/thumbnail.png)
 
@@ -11,8 +12,11 @@ The collection may expand over time with new tweaks or adjustments. If you want 
 
 # Configuration
 The configuration file will be created on the first game run and can be found at
+
 `%AppData%\..\LocalLow\Magnum Scriptum Ltd\Quasimorph_ModConfigs\EdairTweaks\config.txt`.
+
 There is also additional config file for custom difficulty preset
+
 `%AppData%\..\LocalLow\Magnum Scriptum Ltd\Quasimorph_ModConfigs\EdairTweaks\preset.txt`.
 
 Everything can be also configured while in-game without the need to restart it.
