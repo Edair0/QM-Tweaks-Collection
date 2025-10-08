@@ -26,12 +26,24 @@
 	  <EmbeddedResource Remove="Move To Root\**" />
 	  <None Remove="Move To Root\**" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Include="ModConfigData.cs" />
+	  <None Include="ModConfigGeneral.cs" />
+	</ItemGroup>
 
 
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp" publicize="true">
 			<HintPath>$(ManagedPath)Assembly-CSharp.dll</HintPath>
 			<Private>False</Private>
+		</Reference>
+		<Reference Include="MCM, Version=0.0.0.0, Culture=neutral">
+		  <SpecificVersion>False</SpecificVersion>
+		  <HintPath>$(GAME_PATH)\..\..\workshop\content\2059170\3469678797\MCM.dll</HintPath>
+		</Reference>
+		<Reference Include="Harmony">
+			<SpecificVersion>False</SpecificVersion>
+			<HintPath>$(ManagedPath)0Harmony.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
 			<SpecificVersion>False</SpecificVersion>
@@ -54,9 +66,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Lib.harmony" Version="2.3.3" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Newtonsoft.json" Version="13.0.3" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 	</ItemGroup>
 	<PropertyGroup>

@@ -1,23 +1,21 @@
-# Quasimorph Double Backpack Size
+# QM Tweaks Collection (Formely Quasimorph Double Backpack Size)
 
 ![thumbnail icon](media/thumbnail.png)
 
+# About
+A collection of gameplay tweaks for Quasimorph. Includes adjustments I use personally and others that may be useful to different playstyles. 
+All options are disabled by default, so you can enable only what you want. 
+Some changes can affect balance, so enable selectively to preserve your preferred level of challenge and fun.
+
+The collection may expand over time with new tweaks or adjustments. If you want a feature added, feel free to use GitHub Issues for suggestions.
+
 # Configuration
-
 The configuration file will be created on the first game run and can be found at
-`%AppData%\..\LocalLow\Magnum Scriptum Ltd\Quasimorph\edair_mod_inventory\config.json`.
-
-|Name|Description|Mod Default|Vanilla|
-|--|--|--|--|
-|bp_slots_flat|Add or remove flat amount of slot rows to all backpacks|0|0|
-|bp_slots_mult|Multiply slot rows of all backpacks|2|1|
-|bp_weight_flat|Increase or decrease weight reduction % of all backpacks by flat amount|35|0|
-|vest_slots_flat|Add or remove flat amount of slots to all vests|0|0|
-|vest_slots_mult|Multiply slots of all vests|2|1|
-|satiety_kg|Set how many KG of weight are needed for 1 satiety drain|50|10|
+`%AppData%\..\LocalLow\Magnum Scriptum Ltd\Quasimorph_ModConfigs\EdairTweaks\config.txt`.
+There is also additional config file for custom difficulty preset
+`%AppData%\..\LocalLow\Magnum Scriptum Ltd\Quasimorph_ModConfigs\EdairTweaks\preset.txt`.
 
 Everything can be also configured while in-game without the need to restart it.
-Use console command `help mod_inventory` or `mod_inventory` to display all available commands.
 
-# Source Code
-Source code is available on GitHub at https://github.com/Edair0/edair_mod_inventory
+# Requirements
+This mod now requires MCM: https://github.com/Crynano/Mod-Configuration-Menu
