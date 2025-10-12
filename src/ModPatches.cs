@@ -146,16 +146,6 @@ namespace EdairTweaks
         }
     }
 
-    // Temporary fix for current bug where right after spotting an enemy, right click interactions uses action points.
-    [HarmonyPatch(typeof(Player), nameof(Player.HasSpottedEnemyThisAP), MethodType.Getter)]
-    public static class PatchPlayerSpottedEnemy
-    {
-        public static void Postfix(Player __instance, ref bool __result)
-        {
-            __result = false;
-        }
-    }
-
     [HarmonyPatch(typeof(DifficultyScreen), nameof(DifficultyScreen.Configure))]
 
     public static class PatchDifficultyPresets
