@@ -5,18 +5,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static HarmonyLib.Code;
 using static MGSC.BinaryPresetsMap;
 
 namespace EdairTweaks
 {
-    [HarmonyPatch(typeof(VestRecord), "get_SlotCapacity")]
+    [HarmonyPatch(typeof(VestRecord), nameof(VestRecord.SlotCapacity), MethodType.Getter)]
     public static class PatchVest
     {
-        private static void Postfix(ref int __result)
+        public static void Postfix(ref int __result)
         {
             __result = Mathf.RoundToInt(__result * Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.vest_slots_mult));
             __result = Math.Min(__result + Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.vest_slots_flat), 8);
@@ -27,23 +29,98 @@ namespace EdairTweaks
     [HarmonyPatch(typeof(CreatureData), nameof(CreatureData.GetItemsWeight))]
     public static class PatchCreatureItemWeight
     {
-        private static void Postfix(ref float __result)
+        public static void Postfix(ref float __result)
         {
             __result = Mathf.Max(0f, __result * (Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.general_weight_mult) / 100f));
         }
     }
 
-    [HarmonyPatch(typeof(CreatureData), nameof(CreatureData.GetItemsWeightSatietyDrain))]
+    [HarmonyPatch(typeof(CreatureData), nameof(CreatureData.GetStarvMult))]
     public static class PatchSatietyDrain
     {
-        private static void Postfix(ref float __result)
+        public static void Postfix(ref float __result)
         {
-            __result = Mathf.Min(0f, __result * (Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.general_satiety_mult) / 100f));
+            float mult = Plugin.ConfigGeneral.ModData.GetConfigValue<float>(Keys.general_satiety_mult) / 100f;
+            __result = Mathf.Max(0f, __result * mult);
         }
     }
 
-    [HarmonyPatch(typeof(GlobalSettings), "get_NotifyHiddenEnemiesRadius")]
-    public static class PatchPlayerSonar
+    [HarmonyPatch(typeof(AutonomousCapsuleDepartment), nameof(AutonomousCapsuleDepartment.InvokeCapsule))]
+    public static class PatchMagnumCapsuleInvoke
+    {
+        public static void Prefix(AutonomousCapsuleDepartment __instance)
+        {
+            if (__instance.IsActiveDepartment() && __instance.HasFreeCapsule())
+            {
+                __instance.OnPerksUpdated();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(AutonomousCapsuleDepartment), nameof(AutonomousCapsuleDepartment.OnPerksUpdated))]
+    public static class PatchMagnumCapsulePerkUpdate
+    {
+        public static bool Prefix(AutonomousCapsuleDepartment __instance)
+        {
+            int mult = Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.general_capsule_mult);
+            if (mult > 1) 
+            {
+                int autonomousCapsuleInventorySize = __instance._magnumSpaceship.AutonomousCapsuleInventorySize;
+                if (autonomousCapsuleInventorySize * mult != __instance.CapsuleStorage.Height * __instance.CapsuleStorage.Width || mult != __instance.CapsuleStorage.Height)
+                {
+                    List<BasePickupItem> list = new List<BasePickupItem>(__instance.CapsuleStorage.Items);
+                    __instance.CapsuleStorage.RemoveAllItems();
+                    __instance.CapsuleStorage.Resize(autonomousCapsuleInventorySize, 1 * mult);
+                    foreach (BasePickupItem basePickupItem in list)
+                    {
+                        __instance.CapsuleStorage.TryPutItem(basePickupItem, CellPosition.Zero, false, true);
+                    }
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(EscortModeHelper), nameof(EscortModeHelper.SpawnEscortCreature))]
+    public static class PatchEscort
+    {
+        public static void Postfix(Creatures creatures)
+        {
+            if (Plugin.ConfigGeneral.ModData.GetConfigValue<bool>(Keys.escort_tough))
+            {
+                foreach (Monster monster in creatures.Monsters)
+                {
+                    if (monster.CreatureData.CreatureAlliance == CreatureAlliance.PlayerAlliance && monster.CreatureData.IsQuestCreature)
+                    {
+                        monster.CreatureData.Health.IncreaseMaxHealth(monster.CreatureData.Health.MaxValue * 3);
+                        monster.CreatureData.Health.Restore(monster.CreatureData.Health.MaxValue);
+                        monster.CreatureData.OverallResistMult += 0.5f;
+                        monster.CreatureData.BaseOverallDodgeMult += 0.5f;
+                        HealthRegenEffect healthRegen = new HealthRegenEffect(5, 100);
+                        healthRegen.Endless = true;
+                        healthRegen.IsPermanent = true;
+                        monster.CreatureData.EffectsController.Add(healthRegen, false);
+                    }
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(GlobalSettings), nameof(GlobalSettings.RitualMissionDefenseDurationTurns), MethodType.Getter)]
+    public static class PatchRitualTurnLimit
+    {
+        public static void Postfix(ref int __result)
+        {
+            if (Plugin.ConfigGeneral.ModData.GetConfigValue<bool>(Keys.ritual_moretime))
+            {
+                __result *= 5;
+            }         
+        }
+    }
+
+    [HarmonyPatch(typeof(GlobalSettings), nameof(GlobalSettings.NotifyHiddenEnemiesRadius), MethodType.Getter)]
+    public static class PatchPlayerHearingRange
     {
         public static void Postfix(ref int __result)
         {
@@ -69,6 +146,16 @@ namespace EdairTweaks
         }
     }
 
+    // Temporary fix for current bug where right after spotting an enemy, right click interactions uses action points.
+    [HarmonyPatch(typeof(Player), nameof(Player.HasSpottedEnemyThisAP), MethodType.Getter)]
+    public static class PatchPlayerSpottedEnemy
+    {
+        public static void Postfix(Player __instance, ref bool __result)
+        {
+            __result = false;
+        }
+    }
+
     [HarmonyPatch(typeof(DifficultyScreen), nameof(DifficultyScreen.Configure))]
 
     public static class PatchDifficultyPresets
@@ -88,22 +175,22 @@ namespace EdairTweaks
             CustomDifficulty.SmoothProgression = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_SmoothProgression);
             CustomDifficulty.RndStartLocation = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_RndStartLocation);
             CustomDifficulty.RndStartingEquip = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_RndStartingEquip);
-            CustomDifficulty.StartingEquip = (StartingEquip)Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_StartingEquip);
+            CustomDifficulty.StartingEquip = Plugin.ConfigPreset.ModData.GetEnumValue<StartingEquip>(Keys.Preset_StartingEquip);
             CustomDifficulty.RndMercsAtStart = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_RndMercsAtStart);
             CustomDifficulty.StartingMercCount = Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_StartingMercCount);
             CustomDifficulty.RndClassesAtStart = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_RndClassesAtStart);
             CustomDifficulty.StartingClassesCount = Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_StartingClassesCount);
             // Operator
-            CustomDifficulty.RevivePenalty = (RevivePenalty)Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_RevivePenalty);
-            CustomDifficulty.DropPenalty = (DropPenalty)Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_DropPenalty);
+            CustomDifficulty.RevivePenalty = Plugin.ConfigPreset.ModData.GetEnumValue<RevivePenalty>(Keys.Preset_RevivePenalty);
+            CustomDifficulty.DropPenalty = Plugin.ConfigPreset.ModData.GetEnumValue<DropPenalty>(Keys.Preset_DropPenalty);
             CustomDifficulty.DeathGift = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_DeathGift);
             CustomDifficulty.LosePerks = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_LosePerks);
             CustomDifficulty.LoseRank = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_LoseRank);
             CustomDifficulty.ExpMult = Plugin.ConfigPreset.ModData.GetConfigValue<float>(Keys.Preset_ExpMult) / 100f;
-            CustomDifficulty.BackpacksSize = (BackpackSize) Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_BackpacksSize);
-            CustomDifficulty.ItemsStackSize = (ItemStacksSize) Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_ItemsStackSize);
+            CustomDifficulty.BackpacksSize = Plugin.ConfigPreset.ModData.GetEnumValue<BackpackSize>(Keys.Preset_BackpacksSize);
+            CustomDifficulty.ItemsStackSize = Plugin.ConfigPreset.ModData.GetEnumValue<ItemStacksSize>(Keys.Preset_ItemsStackSize);
             // Mission
-            CustomDifficulty.EvacRules = (EvacRules)Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_EvacRules);
+            CustomDifficulty.EvacRules = Plugin.ConfigPreset.ModData.GetEnumValue<EvacRules>(Keys.Preset_EvacRules);
             CustomDifficulty.EquipRepairAfterMission = Plugin.ConfigPreset.ModData.GetConfigValue<bool>(Keys.Preset_EquipRepairAfterMission);
             CustomDifficulty.MissionStageCountMod = Plugin.ConfigPreset.ModData.GetConfigValue<int>(Keys.Preset_MissionStageCountMod);
             CustomDifficulty.EnemyResistance = Plugin.ConfigPreset.ModData.GetConfigValue<float>(Keys.Preset_EnemyResistance);

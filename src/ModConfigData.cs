@@ -1,13 +1,20 @@
 ﻿using MGSC;
 using ModConfigMenu;
+using ModConfigMenu.Contracts;
+using ModConfigMenu.Implementations;
 using ModConfigMenu.Objects;
 using ModConfigMenu.Services;
+using Rewired.Localization;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using UnityEngine;
 
 namespace EdairTweaks
 {
@@ -15,66 +22,58 @@ namespace EdairTweaks
     {
         private string ConfigPath;
         private Dictionary<string, object> Settings;
-        private List<ConfigValue> ConfigValues;
+        private List<IConfigValue> ConfigValues;
 
         public ModConfigData(string ConfigPath)
         {
             this.ConfigPath = ConfigPath;
             this.Settings = new Dictionary<string, object>();
-            this.ConfigValues = new List<ConfigValue>();
-            this.CreateConfig();
+            this.ConfigValues = new List<IConfigValue>();
+            this.LoadConfig();
         }
 
         public void RegisterModConfigData(string menuName, string desc)
         {
-            this.LoadConfig();
             LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{menuName}.key", desc);
             ModConfigMenuAPI.RegisterModConfig($"{Plugin.ModAssemblyName}.{menuName}.key", ConfigValues, OnSave);
         }
 
-        public void AddConfigHeader(string key, string desc)
+        public void AddConfigHeader(string headerKey, string locKey = null)
         {
-            LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{key}.header", desc);
+            GetKeyEnsureLocalization(headerKey, KeyType.Header, locKey);
         }
 
-        public void AddLocalizedConfigValue(string headerKey, string key, string labelKey, string tooltipKey, object defaultValue)
+        public void AddConfigValue(string headerKey, string valueKey, object defaultValue, string labelKey, string tooltipKey)
         {
-            if (!Settings.ContainsKey(key)) { Settings[key] = defaultValue; }
-            ConfigValue result = new ConfigValue(key, Settings[key], headerKey, defaultValue, tooltipKey, labelKey);
+            string headerKeyLoc = GetKeyEnsureLocalization(headerKey, KeyType.Header, valueKey);
+            string labelKeyLoc = GetKeyEnsureLocalization(labelKey, KeyType.Label, valueKey);
+            string tooltipKeyLoc = GetKeyEnsureLocalization(tooltipKey, KeyType.Tooltip, valueKey);
+
+            if (!Settings.ContainsKey(valueKey)) { Settings.Add(valueKey, defaultValue); }
+            ConfigValue result = new ConfigValue(valueKey, Settings[valueKey], headerKeyLoc, defaultValue, tooltipKeyLoc, labelKeyLoc);
             ConfigValues.Add(result);
         }
 
-        public void AddLocalizedConfigValue(string headerKey, string key, string labelKey, string tooltipKey, object defaultValue, float min, float max)
+        public void AddConfigValue(string headerKey, string valueKey, int defaultValue, int min, int max, string labelKey, string tooltipKey)
         {
-            if (!Settings.ContainsKey(key)) { Settings[key] = defaultValue; }
-            ConfigValue result = new ConfigValue(key, Settings[key], headerKey, defaultValue, tooltipKey, labelKey, min, max);
+            string headerKeyLoc = GetKeyEnsureLocalization(headerKey, KeyType.Header, valueKey);
+            string labelKeyLoc = GetKeyEnsureLocalization(labelKey, KeyType.Label, valueKey);
+            string tooltipKeyLoc = GetKeyEnsureLocalization(tooltipKey, KeyType.Tooltip, valueKey);
+
+            if (!Settings.ContainsKey(valueKey)) { Settings.Add(valueKey, defaultValue); }
+            RangeConfig<int> result = new RangeConfig<int>(valueKey, GetConfigValue<int>(valueKey), defaultValue, min, max, headerKeyLoc, tooltipKeyLoc, labelKeyLoc);
             ConfigValues.Add(result);
         }
 
-        public void AddLocalizedConfigValue(string headerKey, string key, string labelKey, string tooltipKey, object defaultValue, List<string> dropdown)
+        public void AddConfigValue(string headerKey, string valueKey, string defaultValue, List<object> valueList, string labelKey, string tooltipKey)
         {
-            if (!Settings.ContainsKey(key)) { Settings[key] = defaultValue; }
-            ConfigValue result = new ConfigValue(key, Settings[key], headerKey, defaultValue, tooltipKey, labelKey, dropdown);
-            MetaData newProp = new MetaData("type", "dropdown");
-            result.Properties.Add(newProp);
-            ConfigValues.Add(result);
-        }
+            string headerKeyLoc = GetKeyEnsureLocalization(headerKey, KeyType.Header, valueKey);
+            string labelKeyLoc = GetKeyEnsureLocalization(labelKey, KeyType.Label, valueKey);
+            string tooltipKeyLoc = GetKeyEnsureLocalization(tooltipKey, KeyType.Tooltip, valueKey);
 
-        public void AddConfigValue(string headerKey, string key, string label, string tooltip, object defaultValue)
-        {
-            if (!Settings.ContainsKey(key)) { Settings[key] = defaultValue; }
-            ConfigValue result = new ConfigValue(key, Settings[key], $"{Plugin.ModAssemblyName}.{headerKey}.header", defaultValue, $"{Plugin.ModAssemblyName}.{key}.tooltip", $"{Plugin.ModAssemblyName}.{key}.label");
-            LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{key}.label", label);
-            LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{key}.tooltip", tooltip);
-            ConfigValues.Add(result);
-        }
+            if (!Settings.ContainsKey(valueKey)) { Settings.Add(valueKey, defaultValue); }
 
-        public void AddConfigValue(string headerKey, string key, string label, string tooltip, object defaultValue, float min, float max)
-        {
-            if (!Settings.ContainsKey(key)) { Settings[key] = defaultValue; }
-            ConfigValue result = new ConfigValue(key, Settings[key], $"{Plugin.ModAssemblyName}.{headerKey}.header", defaultValue, $"{Plugin.ModAssemblyName}.{key}.tooltip", $"{Plugin.ModAssemblyName}.{key}.label", min, max);
-            LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{key}.label", label);
-            LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{key}.tooltip", tooltip);
+            DropdownConfig result = new DropdownConfig(valueKey, GetConfigValue<string>(valueKey), headerKeyLoc, defaultValue, tooltipKeyLoc, labelKeyLoc, valueList);
             ConfigValues.Add(result);
         }
 
@@ -88,6 +87,53 @@ namespace EdairTweaks
             return fallback;
         }
 
+        public TEnum GetEnumValue<TEnum>(string key, TEnum fallback = default) where TEnum : struct, Enum
+        {
+            Debug.Log($"START {key}");
+            string value = GetConfigValue<string>(key);
+            if (string.IsNullOrEmpty(value)) { return fallback; }
+            
+            try
+            {
+                Debug.Log("try start");
+                int dotIndex = value.IndexOf('.');
+                if (dotIndex <= 0) { Debug.Log("RETURN INDEX DOT"); return fallback; }
+                   
+                string numberPart = value.Substring(0, dotIndex);
+                if (int.TryParse(numberPart, out int index))
+                {
+                    Debug.Log("PRASED numberPart");
+                    index -= 1;
+
+                    var values = (TEnum[])Enum.GetValues(typeof(TEnum));
+                    if (index < 0) { Debug.Log("index < 0"); return fallback; }      
+                    if (index >= values.Length) { Debug.Log("index >= values.Length"); return values[values.Length - 1]; }
+                    Debug.Log($"RETURNING INDEX {index} for {key}");
+                    return values[index];
+                }
+                Debug.Log("NOT PRASED numberPart");
+                return fallback;
+            }
+            catch { Debug.Log("RETURN CATCH"); return fallback; }
+        }
+
+        private string GetKeyEnsureLocalization(string key, KeyType keyType, string locKey = null)
+        {
+            if (key.StartsWith("STRING:") && locKey != null)
+            {
+                string data = key.Replace("STRING:", "");
+                string result = $"{Plugin.ModAssemblyName}.{locKey}";
+                if (keyType == KeyType.Header) { result += ".header"; }
+                else if (keyType == KeyType.Label) { result += ".label"; }
+                else if (keyType == KeyType.Tooltip) { result += ".tooltip"; }
+                else if (keyType == KeyType.Description) { result += ".desc"; }
+                
+                if (Localization.HasKey(result)) { return result; }
+                else { LocalizationHelper.AddKeyToAllDictionaries(result, data); return result; }
+            }
+            return key;
+        }
+
         private void CreateConfig()
         {
             if (!File.Exists(ConfigPath)) { Directory.CreateDirectory(Path.GetDirectoryName(ConfigPath)); File.Create(ConfigPath).Close(); }
@@ -96,7 +142,8 @@ namespace EdairTweaks
         private void LoadConfig()
         {
             if (!File.Exists(ConfigPath)) 
-            { 
+            {
+                CreateConfig();
                 return; 
             }
 
@@ -110,18 +157,10 @@ namespace EdairTweaks
                 {
                     string key = parts[0].Trim();
                     string value = parts[1].Trim();
-                    if (!Settings.ContainsKey(key)) { continue; }
-                    else if (int.TryParse(value, out int intValue)) { Settings[key] = intValue; }
-                    else if (float.TryParse(value, out float floatValue)) { Settings[key] = floatValue; }
-                    else if (bool.TryParse(value, out bool boolValue)) { Settings[key] = boolValue; }
-                    else { Settings[key] = value; }
-                }
-            }
-            foreach (var configValue in ConfigValues)
-            {
-                if (Settings.ContainsKey(configValue.Key))
-                {
-                    configValue.Value = Settings[configValue.Key];
+                    if (int.TryParse(value, out int intValue)) { Settings.Add(key, intValue); }
+                    else if (float.TryParse(value, out float floatValue)) { Settings.Add(key, floatValue); }
+                    else if (bool.TryParse(value, out bool boolValue)) { Settings.Add(key, boolValue); }
+                    else { Settings.Add(key, value); }
                 }
             }
         }
@@ -138,5 +177,14 @@ namespace EdairTweaks
             SaveConfig();
             return true;
         }
+
+        public enum KeyType
+        {
+            Header,
+            Label,
+            Tooltip,
+            Description
+        }
+
     }
 }

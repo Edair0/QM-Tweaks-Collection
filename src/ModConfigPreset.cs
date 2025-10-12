@@ -1,4 +1,5 @@
 ﻿using MGSC;
+using ModConfigMenu.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -68,57 +69,319 @@ namespace EdairTweaks
             this.ModName = ModName;
             this.ModData = new ModConfigData(ConfigPath);
 
-            string tooltip_empty = "ui.empty.tooltip";
-            string tooltipFlat = "A flat value.";
-            string tooltipPercent = "A percentage value.";
 
-            //this.ModData.AddConfigHeader(Keys.HeaderStart, "START");
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_Tutorial, "ui.difficulty.Tutorial", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_SmoothProgression, "ui.difficulty.SmoothProgression", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_RndStartLocation, "ui.difficulty.RndStartLocation", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_RndStartingEquip, "ui.difficulty.RndStartingEquip", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_StartingEquip, "ui.difficulty.StartingEquip", tooltip_empty, 2, new List<string> { Localization.Get("ui.difficulty.StartingEquip.none"), Localization.Get("ui.difficulty.StartingEquip.low"), Localization.Get("ui.difficulty.StartingEquip.normal"), Localization.Get("ui.difficulty.StartingEquip.high") });
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_RndMercsAtStart, "ui.difficulty.RndMercsAtStart", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_StartingMercCount, "ui.difficulty.StartingMercCount", tooltipFlat, 4, 1, 6);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_RndClassesAtStart, "ui.difficulty.RndClassesAtStart", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderStart, Keys.Preset_StartingClassesCount, "ui.difficulty.StartingClassesCount", tooltipFlat, 2, 1, 4);
 
-            //this.ModData.AddConfigHeader(Keys.HeaderOperator, "OPERATOR");
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_RevivePenalty, "ui.difficulty.RevivePenalty", tooltip_empty, 1, new List<string> { Localization.Get("ui.difficulty.RevivePenalty.no_penalty"), Localization.Get("ui.difficulty.RevivePenalty.new_clone"), Localization.Get("ui.difficulty.RevivePenalty.lose_chip") });
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_DropPenalty, "ui.difficulty.DropPenalty", tooltip_empty, 2, new List<string> { Localization.Get("ui.difficulty.DropPenalty.none"), Localization.Get("ui.difficulty.DropPenalty.bag"), Localization.Get("ui.difficulty.DropPenalty.full") });
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_DeathGift, "ui.difficulty.DeathGift", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_LosePerks, "ui.difficulty.LosePerks", tooltip_empty, true);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_LoseRank, "ui.difficulty.LoseRank", tooltip_empty, true);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_ExpMult, "ui.difficulty.ExpMult", tooltipPercent, 100, 20, 300);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_BackpacksSize, "ui.difficulty.BackpacksSize", tooltip_empty, 0, new List<string> { Localization.Get("ui.difficulty.BackpacksSize.X1"), Localization.Get("ui.difficulty.BackpacksSize.X2"), Localization.Get("ui.difficulty.BackpacksSize.X3"), Localization.Get("ui.difficulty.BackpacksSize.X4") });
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderOperator, Keys.Preset_ItemsStackSize, "ui.difficulty.ItemsStackSize", tooltip_empty, 0, new List<string> { Localization.Get("ui.difficulty.ItemsStackSize.X1"), Localization.Get("ui.difficulty.ItemsStackSize.X2"), Localization.Get("ui.difficulty.ItemsStackSize.X3"), Localization.Get("ui.difficulty.ItemsStackSize.X4") });
+            // ======================================== START TAB ========================================
 
-            //this.ModData.AddConfigHeader(Keys.HeaderMission, "MISSION");
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_AutoSave, "ui.difficulty.Autosave", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_EvacRules, "ui.difficulty.EvacRules", tooltip_empty, 1, new List<string> { Localization.Get("ui.difficulty.EvacRules.free_evac"), Localization.Get("ui.difficulty.EvacRules.chip_evac"), Localization.Get("ui.difficulty.EvacRules.mission_evac") });
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_EquipRepairAfterMission, "ui.difficulty.EquipRepairAfterMission", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_MissionStageCountMod, "ui.difficulty.MissionStageCountMod", tooltipFlat, 0, -2, 3);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_MonsterPoints, "ui.difficulty.MonsterPoints", tooltipPercent, 100, 20, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_ItemPoints, "ui.difficulty.ItemPoints", tooltipPercent, 100, 25, 300);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderMission, Keys.Preset_KilledMobsItemsCondition, "ui.difficulty.KilledMobsItemsCondition", tooltipPercent, 100, 0 ,100);
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_Tutorial, defaultValue: false, 
+                labelKey: "ui.difficulty.Tutorial", 
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: ON\n" +
+                "Normal: ON\n" +
+                "Unfair: OFF");
 
-            //this.ModData.AddConfigHeader(Keys.HeaderSandbox, "SANDBOX");
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderSandbox, Keys.Preset_ForbidKillFaction, "ui.difficulty.ForbidKillFaction", tooltip_empty, false);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderSandbox, Keys.Preset_FactionGrowthSpeed, "ui.difficulty.FactionGrowthSpeed", tooltipPercent, 100, 25, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderSandbox, Keys.Preset_FactionReputation, "ui.difficulty.FactionReputation", tooltipPercent, 100, 50, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderSandbox, Keys.Preset_MissionRewardPoints, "ui.difficulty.MissionRewardPoints", tooltipPercent, 100, 60, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderSandbox, Keys.Preset_BarterValue, "ui.difficulty.BarterValue", tooltipPercent, 100, 10, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderSandbox, Keys.Preset_MagnumCraftingTime, "ui.difficulty.EnemyActionPoint", tooltipPercent, 100, 20, 400);
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_SmoothProgression, defaultValue: false, 
+                labelKey: "ui.difficulty.SmoothProgression",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: ON\n" +
+                "Normal: ON\n" +
+                "Unfair: OFF");
 
-            //this.ModData.AddConfigHeader(Keys.HeaderCombat, "COMBAT");
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyActionPoint, "ui.difficulty.EnemyActionPoint", tooltipFlat, 0, -1, 2);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyLos, "ui.difficulty.EnemyLos", tooltipFlat, 0, -2, 4);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyHealth, "ui.difficulty.EnemyHealth", tooltipPercent, 100, 50, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyDamageMult, "ui.difficulty.EnemyDamageMult", tooltipPercent, 100, 50, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyDodgeMult, "ui.difficulty.EnemyDodgeMult", tooltipPercent, 100, 50, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyResistance, "ui.difficulty.EnemyResistance", tooltipPercent, 100, 50, 200);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_QmorphLevelGrowth, "ui.difficulty.QmorphLevelGrowth", tooltipPercent, 100, 50, 400);
-            this.ModData.AddLocalizedConfigValue(Keys.HeaderCombat, Keys.Preset_QmorphStatsAffect, "ui.difficulty.QmorphStatsAffect", tooltipPercent, 100, 50, 200);
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_RndStartLocation, defaultValue: false, 
+                labelKey: "ui.difficulty.RndStartLocation",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: OFF\n" +
+                "Normal: OFF\n" +
+                "Unfair: OFF");
+
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_RndStartingEquip, defaultValue: false, 
+                labelKey: "ui.difficulty.RndStartingEquip",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: OFF\n" +
+                "Normal: OFF\n" +
+                "Unfair: ON");
+
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_StartingEquip, 
+                defaultValue: $"3. {Localization.Get("ui.difficulty.StartingEquip.normal")}", 
+                valueList: new List<object>{ 
+                    $"1. {Localization.Get("ui.difficulty.StartingEquip.none")}", 
+                    $"2. {Localization.Get("ui.difficulty.StartingEquip.low")}", 
+                    $"3. {Localization.Get("ui.difficulty.StartingEquip.normal")}", 
+                    $"4. {Localization.Get("ui.difficulty.StartingEquip.high")}"},
+                labelKey: "ui.difficulty.StartingEquip",
+                tooltipKey: "STRING:Default values:\n\n" +
+                $"Easy: {Localization.Get("ui.difficulty.StartingEquip.high")}\n" +
+                $"Normal: {Localization.Get("ui.difficulty.StartingEquip.normal")}\n" +
+                $"Unfair: {Localization.Get("ui.difficulty.StartingEquip.low")}");
+
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_RndMercsAtStart, defaultValue: false,
+                labelKey: "ui.difficulty.RndMercsAtStart",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: OFF\n" +
+                "Normal: OFF\n" +
+                "Unfair: ON");
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_StartingMercCount, defaultValue: 4, min: 1, max: 6,
+                labelKey: "ui.difficulty.StartingMercCount",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 6\n" +
+                "Normal: 4\n" +
+                "Unfair: 2");
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_RndClassesAtStart, defaultValue: false, 
+                labelKey: "ui.difficulty.RndClassesAtStart",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: OFF\n" +
+                "Normal: OFF\n" +
+                "Unfair: ON");
+            this.ModData.AddConfigValue(Keys.HeaderStart, Keys.Preset_StartingClassesCount, defaultValue: 2, min: 1, max: 4, 
+                labelKey: "ui.difficulty.StartingClassesCount",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 4\n" +
+                "Normal: 2\n" +
+                "Unfair: 2");
+
+
+
+            // ======================================== OPERATOR TAB ========================================
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_RevivePenalty,
+                defaultValue: $"2. {Localization.Get("ui.difficulty.RevivePenalty.new_clone")}",
+                valueList: new List<object>{
+                    $"1. {Localization.Get("ui.difficulty.RevivePenalty.no_penalty")}",
+                    $"2. {Localization.Get("ui.difficulty.RevivePenalty.new_clone")}",
+                    $"3. {Localization.Get("ui.difficulty.RevivePenalty.lose_chip")}"},
+                labelKey: "ui.difficulty.RevivePenalty",
+                tooltipKey: "STRING:Default values:\n\n" +
+                $"Easy: {Localization.Get("ui.difficulty.RevivePenalty.no_penalty")}\n" +
+                $"Normal: {Localization.Get("ui.difficulty.RevivePenalty.new_clone")}\n" +
+                $"Unfair: {Localization.Get("ui.difficulty.RevivePenalty.lose_chip")}");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_DropPenalty,
+                defaultValue: $"3. {Localization.Get("ui.difficulty.DropPenalty.full")}",
+                valueList: new List<object>{
+                    $"1. {Localization.Get("ui.difficulty.DropPenalty.none")}",
+                    $"2. {Localization.Get("ui.difficulty.DropPenalty.bag")}",
+                    $"3. {Localization.Get("ui.difficulty.DropPenalty.full")}"},
+
+                labelKey: "ui.difficulty.DropPenalty",
+                tooltipKey: "STRING:Default values:\n\n" +
+                $"Easy: {Localization.Get("ui.difficulty.DropPenalty.none")}\n" +
+                $"Normal: {Localization.Get("ui.difficulty.DropPenalty.full")}\n" +
+                $"Unfair: {Localization.Get("ui.difficulty.DropPenalty.full")}");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_DeathGift, defaultValue: false, 
+                labelKey: "ui.difficulty.DeathGift",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: ON\n" +
+                "Normal: ON\n" +
+                "Unfair: OFF");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_LosePerks, defaultValue: true, 
+                labelKey: "ui.difficulty.LosePerks",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: OFF\n" +
+                "Normal: ON\n" +
+                "Unfair: ON");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_LoseRank, defaultValue: true, 
+                labelKey: "ui.difficulty.LoseRank",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: OFF\n" +
+                "Normal: ON\n" +
+                "Unfair: ON");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_ExpMult, defaultValue: 100, min: 20, max: 300, 
+                labelKey: "ui.difficulty.ExpMult",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 50%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 200%");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_BackpacksSize,
+                defaultValue: $"1. {Localization.Get("ui.difficulty.BackpacksSize.X1")}",
+                valueList: new List<object>{
+                    $"1. {Localization.Get("ui.difficulty.BackpacksSize.X1")}",
+                    $"2. {Localization.Get("ui.difficulty.BackpacksSize.X2")}",
+                    $"3. {Localization.Get("ui.difficulty.BackpacksSize.X3")}",
+                    $"4. {Localization.Get("ui.difficulty.BackpacksSize.X4")}"},
+                labelKey: "ui.difficulty.BackpacksSize",
+                tooltipKey: "STRING:Default values:\n\n" +
+                $"Easy: {Localization.Get("ui.difficulty.BackpacksSize.X2")}\n" +
+                $"Normal: {Localization.Get("ui.difficulty.BackpacksSize.X1")}\n" +
+                $"Unfair: {Localization.Get("ui.difficulty.BackpacksSize.X1")}");
+
+            this.ModData.AddConfigValue(Keys.HeaderOperator, Keys.Preset_ItemsStackSize,
+                defaultValue: $"1. {Localization.Get("ui.difficulty.ItemsStackSize.X1")}",
+                valueList: new List<object>{
+                    $"1. {Localization.Get("ui.difficulty.ItemsStackSize.X1")}",
+                    $"2. {Localization.Get("ui.difficulty.ItemsStackSize.X2")}",
+                    $"3. {Localization.Get("ui.difficulty.ItemsStackSize.X3")}",
+                    $"4. {Localization.Get("ui.difficulty.ItemsStackSize.X4")}"},
+                labelKey: "ui.difficulty.ItemsStackSize",
+                tooltipKey: "STRING:Default values:\n\n" +
+                $"Easy: {Localization.Get("ui.difficulty.ItemsStackSize.X1")}\n" +
+                $"Normal: {Localization.Get("ui.difficulty.ItemsStackSize.X1")}\n" +
+                $"Unfair: {Localization.Get("ui.difficulty.ItemsStackSize.X1")}");
+
+
+
+            // ======================================== MISSION TAB ========================================
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_AutoSave, defaultValue: false, 
+                labelKey: "ui.difficulty.Autosave",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: ON\n" +
+                "Normal: OFF\n" +
+                "Unfair: OFF");
+
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_EvacRules,
+                defaultValue: $"2. {Localization.Get("ui.difficulty.EvacRules.chip_evac")}",
+                valueList: new List<object>{
+                    $"1. {Localization.Get("ui.difficulty.EvacRules.free_evac")}",
+                    $"2. {Localization.Get("ui.difficulty.EvacRules.chip_evac")}",
+                    $"3. {Localization.Get("ui.difficulty.EvacRules.mission_evac")}"},
+                labelKey: "ui.difficulty.EvacRules",
+                tooltipKey: "STRING:Default values:\n\n" +
+                $"Easy: {Localization.Get("ui.difficulty.EvacRules.free_evac")}\n" +
+                $"Normal: {Localization.Get("ui.difficulty.EvacRules.chip_evac")}\n" +
+                $"Unfair: {Localization.Get("ui.difficulty.EvacRules.mission_evac")}");
+
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_EquipRepairAfterMission, defaultValue: false, 
+                labelKey: "ui.difficulty.EquipRepairAfterMission",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: ON\n" +
+                "Normal: OFF\n" +
+                "Unfair: OFF");
+
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_MissionStageCountMod, defaultValue: 0, min: -2, max: 3, 
+                labelKey: "ui.difficulty.MissionStageCountMod",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 0\n" +
+                "Normal: 0\n" +
+                "Unfair: 1");
+
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_MonsterPoints, defaultValue: 100, min: 0, max: 300, 
+                labelKey: "ui.difficulty.MonsterPoints",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_ItemPoints, defaultValue: 100, min: 0, max: 300, 
+                labelKey: "ui.difficulty.ItemPoints",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 120%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 80%");
+
+            this.ModData.AddConfigValue(Keys.HeaderMission, Keys.Preset_KilledMobsItemsCondition, defaultValue: 100, min: 0, max: 100, 
+                labelKey: "ui.difficulty.KilledMobsItemsCondition",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 100%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 70%");
+
+
+
+            // ======================================== SANDBOX TAB ========================================
+            this.ModData.AddConfigValue(Keys.HeaderSandbox, Keys.Preset_ForbidKillFaction, defaultValue: false, 
+                labelKey: "ui.difficulty.ForbidKillFaction",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: ON\n" +
+                "Normal: OFF\n" +
+                "Unfair: OFF");
+
+            this.ModData.AddConfigValue(Keys.HeaderSandbox, Keys.Preset_FactionGrowthSpeed, defaultValue: 100, min: 0, max: 400, 
+                labelKey: "ui.difficulty.FactionGrowthSpeed",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
+            this.ModData.AddConfigValue(Keys.HeaderSandbox, Keys.Preset_FactionReputation, defaultValue: 100, min: 0, max: 400, 
+                labelKey: "ui.difficulty.FactionReputation",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 120%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 80%");
+
+            this.ModData.AddConfigValue(Keys.HeaderSandbox, Keys.Preset_MissionRewardPoints, defaultValue: 100, min: 0, max: 400, 
+                labelKey: "ui.difficulty.MissionRewardPoints",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 120%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 80%");
+
+            this.ModData.AddConfigValue(Keys.HeaderSandbox, Keys.Preset_BarterValue, defaultValue: 100, min: 0, max: 400, 
+                labelKey: "ui.difficulty.BarterValue",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 120%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 80%");
+
+            this.ModData.AddConfigValue(Keys.HeaderSandbox, Keys.Preset_MagnumCraftingTime, defaultValue: 100, min: 0, max: 400, 
+                labelKey: "ui.difficulty.MagnumCraftingTime",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy: 200%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 50%");
+
+
+
+            // ======================================== COMBAT TAB ========================================
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyActionPoint, defaultValue: 0, min: -1, max: 2, 
+                labelKey: "ui.difficulty.EnemyActionPoint",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : -1\n" +
+                "Normal: 0\n" +
+                "Unfair: 1");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyLos, defaultValue: 0, min: -2, max: 4, 
+                labelKey: "ui.difficulty.EnemyLos",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : -1\n" +
+                "Normal: 0\n" +
+                "Unfair: 2");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyHealth, defaultValue: 100, min: 50, max: 200, 
+                labelKey: "ui.difficulty.EnemyHealth",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyDamageMult, defaultValue: 100, min: 25, max: 200, 
+                labelKey: "ui.difficulty.EnemyDamageMult",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyDodgeMult, defaultValue: 100, min: 25, max: 200, 
+                labelKey: "ui.difficulty.EnemyDodgeMult",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : 70%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 100%");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_EnemyResistance, defaultValue: 100, min: 25, max: 200, 
+                labelKey: "ui.difficulty.EnemyResistance",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_QmorphLevelGrowth, defaultValue: 100, min: 25, max: 400, 
+                labelKey: "ui.difficulty.QmorphLevelGrowth",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
+            this.ModData.AddConfigValue(Keys.HeaderCombat, Keys.Preset_QmorphStatsAffect, defaultValue: 100, min: 25, max: 200, 
+                labelKey: "ui.difficulty.QmorphStatsAffect",
+                tooltipKey: "STRING:Default values:\n\n" +
+                "Easy  : 80%\n" +
+                "Normal: 100%\n" +
+                "Unfair: 120%");
+
 
             this.ModData.RegisterModConfigData(this.ModName, "QM Custom Preset");
         }
