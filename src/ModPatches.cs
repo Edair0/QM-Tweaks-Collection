@@ -20,7 +20,6 @@ namespace EdairTweaks
     {
         public static void Postfix(ref int __result)
         {
-            __result = Mathf.RoundToInt(__result * Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.vest_slots_mult));
             __result = Math.Min(__result + Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.vest_slots_flat), 8);
             __result = Math.Max(__result, 1);
         }
@@ -107,7 +106,7 @@ namespace EdairTweaks
         }
     }
 
-    [HarmonyPatch(typeof(GlobalSettings), nameof(GlobalSettings.RitualMissionDefenseDurationTurns), MethodType.Getter)]
+    [HarmonyPatch(typeof(GlobalSettings), nameof(GlobalSettings.CounterattackMissionDurationTurns), MethodType.Getter)]
     public static class PatchRitualTurnLimit
     {
         public static void Postfix(ref int __result)
@@ -119,14 +118,15 @@ namespace EdairTweaks
         }
     }
 
-    [HarmonyPatch(typeof(GlobalSettings), nameof(GlobalSettings.NotifyHiddenEnemiesRadius), MethodType.Getter)]
-    public static class PatchPlayerHearingRange
+    [HarmonyPatch(typeof(GlobalSettings), nameof(GlobalSettings.ImplantGainChanceOnAmputation), MethodType.Getter)]
+    public static class PatchAmputationChance
     {
-        public static void Postfix(ref int __result)
+        public static void Postfix(ref float __result)
         {
-            if (Plugin.ConfigGeneral.ModData.GetConfigValue<bool>(Keys.hearing_enabled))
+            int chance = Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.amputation_chance);
+            if (chance != 30)
             {
-                __result += Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.hearing_range_modifier);
+                __result = chance / 100;
             }
         }
     }
@@ -136,11 +136,19 @@ namespace EdairTweaks
     {
         public static void Postfix(Player __instance, ref bool __result)
         {
-            if (Plugin.ConfigGeneral.ModData.GetConfigValue<bool>(Keys.hearing_enabled) && __result == false)
+            if (Plugin.ConfigGeneral.ModData.GetConfigValue<bool>(Keys.hearing_enabled) && !__instance.CreatureData.EffectsController.HasAnyEffect<WoundEffectNoSpottedSignal>())
             {
-                if (!__instance.CreatureData.EffectsController.HasAnyEffect<WoundEffectNoSpottedSignal>())
+                if (__result == false)
                 {
+                    if (__instance.MovementState == CreatureMovementState.Normal) 
+                    { Data.Global.NotifyHiddenEnemiesRadius = Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.hearing_range_walk); }
+                    else if (__instance.MovementState == CreatureMovementState.Run) 
+                    { Data.Global.NotifyHiddenEnemiesRadius = Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.hearing_range_run); }              
                     __result = true;
+                }
+                else if (__instance.MovementState == CreatureMovementState.Slow)
+                {
+                    Data.Global.NotifyHiddenEnemiesRadius = Plugin.ConfigGeneral.ModData.GetConfigValue<int>(Keys.hearing_range_stealth);
                 }
             }
         }

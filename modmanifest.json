@@ -1,0 +1,9 @@
+{
+  "UniqueModName": "EdairTweaks",
+  "Assemblies": [ "EdairTweaks.dll" ],
+  "Dependencies": [ "Crynano_ModConfigMenu" ],
+  "SteamTags": [
+    "0.9.7",
+    "Gameplay Tweaks"
+  ]
+}

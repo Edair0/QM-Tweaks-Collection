@@ -36,8 +36,8 @@ namespace EdairTweaks
                 new HarmonyHelper.PatchInfo(typeof(AutonomousCapsuleDepartment), nameof(AutonomousCapsuleDepartment.InvokeCapsule), MethodType.Normal, typeof(PatchMagnumCapsuleInvoke)),
                 new HarmonyHelper.PatchInfo(typeof(AutonomousCapsuleDepartment), nameof(AutonomousCapsuleDepartment.OnPerksUpdated), MethodType.Normal, typeof(PatchMagnumCapsulePerkUpdate)),
                 new HarmonyHelper.PatchInfo(typeof(EscortModeHelper), nameof(EscortModeHelper.SpawnEscortCreature), MethodType.Normal, typeof(PatchEscort)),
-                new HarmonyHelper.PatchInfo(typeof(GlobalSettings), nameof(GlobalSettings.RitualMissionDefenseDurationTurns), MethodType.Getter, typeof(PatchRitualTurnLimit)),
-                new HarmonyHelper.PatchInfo(typeof(GlobalSettings), nameof(GlobalSettings.NotifyHiddenEnemiesRadius), MethodType.Getter, typeof(PatchPlayerHearingRange)),
+                new HarmonyHelper.PatchInfo(typeof(GlobalSettings), nameof(GlobalSettings.CounterattackMissionDurationTurns), MethodType.Getter, typeof(PatchRitualTurnLimit)),
+                new HarmonyHelper.PatchInfo(typeof(GlobalSettings), nameof(GlobalSettings.ImplantGainChanceOnAmputation), MethodType.Getter, typeof(PatchAmputationChance)),
                 new HarmonyHelper.PatchInfo(typeof(Player), nameof(Player.IsAbleToSpotAnEnemy), MethodType.Normal, typeof(PatchPlayerSpotEnemy)),
                 new HarmonyHelper.PatchInfo(typeof(DifficultyScreen), nameof(DifficultyScreen.Configure), MethodType.Normal, typeof(PatchDifficultyPresets))
             );

@@ -18,19 +18,23 @@ namespace EdairTweaks
     public static partial class Keys
     {
         public const string HeaderCharacter = "character";
-        public const string HeaderInventory = "inventory";
-        public const string HeaderQuest = "quest";
-
         public const string general_weight_mult = "general_weight_mult";
         public const string general_satiety_mult = "general_satiety_mult";
-        public const string general_capsule_mult = "general_capsule_mult";
-        public const string vest_slots_flat = "vest_slots_flat";
-        public const string vest_slots_mult = "vest_slots_mult";
+        public const string hearing_enabled = "hearing_enabled";
+        public const string hearing_range_stealth = "hearing_range_stealth";
+        public const string hearing_range_walk = "hearing_range_walk";
+        public const string hearing_range_run = "hearing_range_run";
 
+        public const string HeaderInventory = "inventory";
+        public const string vest_slots_flat = "vest_slots_flat";
+        public const string general_capsule_mult = "general_capsule_mult";
+
+        public const string HeaderQuest = "quest";
         public const string escort_tough = "escort_tough";
         public const string ritual_moretime = "ritual_moretime";
-        public const string hearing_enabled = "sonar_enabled";
-        public const string hearing_range_modifier = "sonar_range";
+
+        public const string HeaderOther = "other";
+        public const string amputation_chance = "amputation_chance";
     }
 
 
@@ -58,19 +62,31 @@ namespace EdairTweaks
             this.ModData.AddConfigValue(Keys.HeaderCharacter, Keys.general_satiety_mult, defaultValue: 100, min: 10, max: 200,
                 labelKey: "STRING:Global Satiety Drain",
                 tooltipKey: "STRING:A global multiplier for the player character’s satiety drain rate (in percent).\n\n" +
-                "0     = No satiety drain.\n" +
+                "0     = No satiety drain\n" +
                 "50   = Half the normal drain\n" +
                 "100 = Normal drain\n" +
                 "200 = Double drain");
-            
+
             this.ModData.AddConfigValue(Keys.HeaderCharacter, Keys.hearing_enabled, defaultValue: false,
-                labelKey: "STRING:Hearing Always Active",
-                tooltipKey: "STRING:When enabled, the hearing effect remains active while walking and running. Certain wounds can still disable it.");
-            
-            this.ModData.AddConfigValue(Keys.HeaderCharacter, Keys.hearing_range_modifier, defaultValue: 0, min: - 6, max: 6,
-                labelKey: "STRING:Hearing Range",
-                tooltipKey: "STRING:Modifies the effective radius of the player’s hearing (in tiles).\n" +
-                "Default radius: ~6 tiles.");
+                labelKey: "STRING:Custom Hearing Settings",
+                tooltipKey: "STRING:Allows modifying hearing ranges for each movement mode.\n\n" +
+                "ON  = Uses custom settings below\n" +
+                "OFF = Uses default settings");
+
+            this.ModData.AddConfigValue(Keys.HeaderCharacter, Keys.hearing_range_stealth, defaultValue: 6, min: 0, max: 16,
+                labelKey: "STRING:Hearing Range - Stealth",
+                tooltipKey: "STRING:Modifies the effective radius of the player’s hearing while in stealth mode.\n\n" +
+                "Default radius: 6 tiles");
+
+            this.ModData.AddConfigValue(Keys.HeaderCharacter, Keys.hearing_range_walk, defaultValue: 0, min: 0, max: 16,
+                labelKey: "STRING:Hearing Range - Walk",
+                tooltipKey: "STRING:Modifies the effective radius of the player’s hearing while in walk mode.\n\n" +
+                "Default radius: 0 tiles - OFF");
+
+            this.ModData.AddConfigValue(Keys.HeaderCharacter, Keys.hearing_range_run, defaultValue: 0, min: 0, max: 16,
+                labelKey: "STRING:Hearing Range - Run",
+                tooltipKey: "STRING:Modifies the effective radius of the player’s hearing while in run mode.\n\n" +
+                "Default radius: 0 tiles - OFF");
 
             // ======================================== Inventory Settings ========================================
             this.ModData.AddConfigHeader("STRING:Inventory Settings", Keys.HeaderInventory);
@@ -100,7 +116,17 @@ namespace EdairTweaks
             this.ModData.AddConfigValue(Keys.HeaderQuest, Keys.ritual_moretime, defaultValue: false,
                 labelKey: "STRING:Extended Ritual Timer",
                 tooltipKey: "STRING:Multiplies the turn limit in ritual missions, giving 5× more time to complete them.");
-			
+
+            // ======================================== Other Settings ========================================
+            this.ModData.AddConfigHeader("STRING:Other Settings", Keys.HeaderOther);
+
+            this.ModData.AddConfigValue(Keys.HeaderOther, Keys.amputation_chance, defaultValue: 30, min: 0, max: 100,
+                labelKey: "STRING:Implant Amputation Chance",
+                tooltipKey: $"STRING:Chance to obtain an implant from an amputated part of a corpse.\n\n" +
+                "0% = No chance\n" +
+                "30% = Default chance\n" +
+                "100% = Guaranteed");
+
             this.ModData.RegisterModConfigData(this.ModName, "QM Tweaks Collection");
 		}
     }
