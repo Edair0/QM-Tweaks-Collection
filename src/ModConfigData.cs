@@ -32,10 +32,9 @@ namespace EdairTweaks
             this.LoadConfig();
         }
 
-        public void RegisterModConfigData(string menuName, string desc)
+        public void RegisterModConfigData(string menuName)
         {
-            LocalizationHelper.AddKeyToAllDictionaries($"{Plugin.ModAssemblyName}.{menuName}.key", desc);
-            ModConfigMenuAPI.RegisterModConfig($"{Plugin.ModAssemblyName}.{menuName}.key", ConfigValues, OnSave);
+            ModConfigMenuAPI.RegisterModConfig(menuName, ConfigValues, OnSave);
         }
 
         public void AddConfigHeader(string headerKey, string locKey = null)
@@ -89,32 +88,27 @@ namespace EdairTweaks
 
         public TEnum GetEnumValue<TEnum>(string key, TEnum fallback = default) where TEnum : struct, Enum
         {
-            Debug.Log($"START {key}");
             string value = GetConfigValue<string>(key);
             if (string.IsNullOrEmpty(value)) { return fallback; }
             
             try
             {
-                Debug.Log("try start");
                 int dotIndex = value.IndexOf('.');
-                if (dotIndex <= 0) { Debug.Log("RETURN INDEX DOT"); return fallback; }
+                if (dotIndex <= 0) { return fallback; }
                    
                 string numberPart = value.Substring(0, dotIndex);
                 if (int.TryParse(numberPart, out int index))
                 {
-                    Debug.Log("PRASED numberPart");
                     index -= 1;
 
                     var values = (TEnum[])Enum.GetValues(typeof(TEnum));
-                    if (index < 0) { Debug.Log("index < 0"); return fallback; }      
-                    if (index >= values.Length) { Debug.Log("index >= values.Length"); return values[values.Length - 1]; }
-                    Debug.Log($"RETURNING INDEX {index} for {key}");
+                    if (index < 0) { return fallback; }      
+                    if (index >= values.Length) { return values[values.Length - 1]; }
                     return values[index];
                 }
-                Debug.Log("NOT PRASED numberPart");
                 return fallback;
             }
-            catch { Debug.Log("RETURN CATCH"); return fallback; }
+            catch { return fallback; }
         }
 
         private string GetKeyEnsureLocalization(string key, KeyType keyType, string locKey = null)

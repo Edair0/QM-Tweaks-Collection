@@ -25,8 +25,8 @@ namespace EdairTweaks
         [Hook(ModHookType.AfterConfigsLoaded)]
         public static void AfterConfig(IModContext context)
         {
-            ConfigGeneral = new ModConfigGeneral("general", ConfigPath);
-            ConfigPreset = new ModConfigPreset("preset", PresetPath);
+            ConfigGeneral = new ModConfigGeneral("QM Tweaks Collection", ConfigPath);
+            ConfigPreset = new ModConfigPreset("QM Custom Preset", PresetPath);
             Harmony harmony = new Harmony("Edair0_" + ModAssemblyName);
 
             HarmonyHelper.ApplyPatches(harmony,

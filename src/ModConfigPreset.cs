@@ -386,7 +386,7 @@ namespace EdairTweaks
                 $"{Localization.Get("ui.difficulty.Hard.name")}: 120%");
 
 
-            this.ModData.RegisterModConfigData(this.ModName, "QM Custom Preset");
+            this.ModData.RegisterModConfigData(this.ModName);
         }
 
     }

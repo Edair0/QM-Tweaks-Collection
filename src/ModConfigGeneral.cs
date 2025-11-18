@@ -127,7 +127,7 @@ namespace EdairTweaks
                 "30% = Default chance\n" +
                 "100% = Guaranteed");
 
-            this.ModData.RegisterModConfigData(this.ModName, "QM Tweaks Collection");
+            this.ModData.RegisterModConfigData(this.ModName);
 		}
     }
 
